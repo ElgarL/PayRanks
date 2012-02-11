@@ -1,0 +1,4 @@
+1.0d:
+	- Removed all hooks for vault.
+	- Update to JRE 1.7.
+	- Configured as a demo of using GroupManager as a service with iConomy 5.01.

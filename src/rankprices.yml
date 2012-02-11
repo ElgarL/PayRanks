@@ -1,12 +1,10 @@
 groupslist:
-- default
-- group1
-- group2
+- Default
+- Builder
 
 groups:
-   default: 0
-   group1: 500
-   group2: 1000
+   Default: 0
+   Builder: 30
 
 # These lists are ordered from lowest rank to highest rank.
 # If you change default make sure you change it to the group

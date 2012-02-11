@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.anjocaido.groupmanager.data.Group;
+import org.anjocaido.groupmanager.dataholder.worlds.WorldsHolder;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -16,25 +18,25 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import net.milkbowl.vault.economy.Economy;
-import net.milkbowl.vault.permission.Permission;
 
-import com.nijiko.permissions.PermissionHandler;
+import com.iConomy.iConomy;
+import com.iConomy.system.Account;
+
 
 public class PayRanks extends JavaPlugin
 {
-    public static PermissionHandler Permissions = null;
     static boolean UsePermissions;
 	public final Logger logger = Logger.getLogger("Minecraft");
 	public File RankFile;
 	public static FileConfiguration Rank;
 	HashMap<String, String> ranks = new HashMap<String, String>();
 	public int Hashlen;
-	public static Economy economy = null;
-	public static Permission permission = null;
+	//public static iConomy economy = null;
+	public static WorldsHolder permission = null;
     
 	public void onEnable()
 	{
@@ -55,16 +57,14 @@ public class PayRanks extends JavaPlugin
 	
     private Boolean setupEconomy()
     {
-        RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
-        if (economyProvider != null) {
-            economy = economyProvider.getProvider();
-        }
-        return (economy != null);
+    	Plugin economyProvider = getServer().getPluginManager().getPlugin("iConomy");
+
+        return (economyProvider != null);
     }
     
     private Boolean setupPermission()
     {
-        RegisteredServiceProvider<Permission> permissionProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
+        RegisteredServiceProvider<WorldsHolder> permissionProvider = getServer().getServicesManager().getRegistration(org.anjocaido.groupmanager.dataholder.worlds.WorldsHolder.class);
         if (permissionProvider != null) {
             permission = permissionProvider.getProvider();
         }
@@ -76,10 +76,9 @@ public class PayRanks extends JavaPlugin
 		this.logger.info("[" + pdfFile.getName() + "] has been disabled.");
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void setupHash()
 	{
-	    List<String> ranklist = Rank.getList("groupslist");
+	    List<String> ranklist = Rank.getStringList("groupslist");
 	    String[] rankarray = ranklist.toArray(new String[]{});
 	    Integer i = 0;
 	    Hashlen = rankarray.length;
@@ -97,12 +96,11 @@ public class PayRanks extends JavaPlugin
 		return false;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void readCommand(final Player sender, String command, String[] args)
 	{
 		if(command.equalsIgnoreCase("rankup"))
 		{
-			List<String> rlist= Rank.getList("groupslist");
+			List<String> rlist= Rank.getStringList("groupslist");
 		    String[] rarr = rlist.toArray(new String[]{});
 		    Integer Len = rarr.length;
 			Integer i = Len;
@@ -112,7 +110,7 @@ public class PayRanks extends JavaPlugin
 				String rnum = i.toString();
 		    	String key = ("rank" + rnum);
 		    	String rank = ranks.get(key);
-		    	if(permission.playerInGroup(sender, rank))
+		    	if(permission.getWorldData(sender).getPermissionsHandler().inGroup(sender.getName(), rank))
 		    	{
 		    		if(i == (Len - 1))
 		    		{
@@ -121,15 +119,16 @@ public class PayRanks extends JavaPlugin
 		    		}
 		    		else if(i < Len)
 		    		{
+		    			Account account = iConomy.getAccount(sender.getName());
 		    			String rnumx = nextr.toString();
 		    			String keyx = ("rank" + rnumx);
 		    			String rankx = ranks.get(keyx);
-		    			if(economy.has(sender.getName(), Rank.getInt("groups." + rankx)))
+		    			if(account.getHoldings().hasEnough(Rank.getInt("groups." + rankx)))
 		    			{
-		    				permission.playerAddGroup(sender.getWorld(), sender.getName(), rankx);
-		    				permission.playerRemoveGroup(sender.getWorld(), sender.getName(), rank);
-		    				economy.withdrawPlayer(sender.getName(), Rank.getInt("groups." + rankx));
-		    				sender.sendMessage(ChatColor.GREEN + "You have been promoted to the rank of: " + ChatColor.BLUE + rankx);
+		    				Group newGroup = permission.getWorldData(sender).getGroup(rankx);
+		    				permission.getWorldData(sender).getUser(sender.getName()).setGroup(newGroup);
+		    				account.getHoldings().subtract(Rank.getInt("groups." + rankx));
+		    				//sender.sendMessage(ChatColor.GREEN + "You have been promoted to the rank of: " + ChatColor.BLUE + rankx);
 		    				Bukkit.broadcastMessage(ChatColor.AQUA + sender.getName() + ChatColor.GREEN + " has been promoted to the rank of: " + ChatColor.BLUE + rankx);
 		    				return;
 		    			}
@@ -140,19 +139,14 @@ public class PayRanks extends JavaPlugin
 		    				sender.sendMessage(ChatColor.RED + "You need " + ChatColor.BLUE + pricex + ChatColor.RED + " to purchase the rank of: " + ChatColor.BLUE + rankx);
 		    				return;
 		    			}
-		    			
 		    		}
 		    	}
 		    	nextr--;
 		    	i--;
-		    	
 			}
 		}
 	}
 	
-	
-	
-    
 	public void saveYamls() {
 	    try {
 	        Rank.save(RankFile);
