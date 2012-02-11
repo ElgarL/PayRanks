@@ -29,14 +29,14 @@ import com.iConomy.system.Account;
 
 public class PayRanks extends JavaPlugin
 {
-    static boolean UsePermissions;
-	public final Logger logger = Logger.getLogger("Minecraft");
-	public File RankFile;
-	public static FileConfiguration Rank;
+	protected boolean UsePermissions;
+    protected final Logger logger = Logger.getLogger("Minecraft");
+	protected File RankFile;
+	protected FileConfiguration Rank;
 	HashMap<String, String> ranks = new HashMap<String, String>();
-	public int Hashlen;
+	protected int Hashlen;
 	//public static iConomy economy = null;
-	public static WorldsHolder permission = null;
+	protected WorldsHolder permission = null;
     
 	public void onEnable()
 	{
@@ -72,6 +72,11 @@ public class PayRanks extends JavaPlugin
     }
 	public void onDisable()
 	{
+		// Release all handles.
+		Rank = null;
+		ranks = null;
+		permission = null;
+		
 	    PluginDescriptionFile pdfFile = this.getDescription();
 		this.logger.info("[" + pdfFile.getName() + "] has been disabled.");
 	}
