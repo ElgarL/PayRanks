@@ -1,4 +1,4 @@
-package me.polaris120990.PayRanks;
+package com.palmergames.GMPayRanks;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -18,16 +18,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.iConomy.iConomy;
-import com.iConomy.system.Account;
 
-
-public class PayRanks extends JavaPlugin
+public class GMPayRanks extends JavaPlugin
 {
 	protected boolean UsePermissions;
     protected final Logger logger = Logger.getLogger("Minecraft");
@@ -35,32 +31,30 @@ public class PayRanks extends JavaPlugin
 	protected FileConfiguration Rank;
 	HashMap<String, String> ranks = new HashMap<String, String>();
 	protected int Hashlen;
-	//public static iConomy economy = null;
+	
 	protected WorldsHolder permission = null;
     
 	public void onEnable()
 	{
-	    PluginDescriptionFile pdfFile = this.getDescription();
-		this.logger.info("[" + pdfFile.getName() + "] v" + pdfFile.getVersion() + " has been enabled.");
-		RankFile = new File(getDataFolder(), "rankprices.yml");
-	    try {
-	        firstRun();
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
-	    Rank = new YamlConfiguration();
-	    loadYamls();
-	    setupHash();
-	    setupEconomy();
-		setupPermission();
-	}
-	
-    private Boolean setupEconomy()
-    {
-    	Plugin economyProvider = getServer().getPluginManager().getPlugin("iConomy");
+		if (EconomyHandler.setupEconomy() && setupPermission()) {
+		
+		    PluginDescriptionFile pdfFile = this.getDescription();
+		    this.logger.info("[" + pdfFile.getName() + "] Economy handler type set to " + EconomyHandler.getType().toString());
+			this.logger.info("[" + pdfFile.getName() + "] v" + pdfFile.getVersion() + " has been enabled.");
+			RankFile = new File(getDataFolder(), "rankprices.yml");
+		    try {
+		        firstRun();
+		    } catch (Exception e) {
+		        e.printStackTrace();
+		    }
+		    Rank = new YamlConfiguration();
+		    loadYamls();
+		    setupHash();
+		} else {
+			this.getServer().getPluginManager().disablePlugin(this);
+		}
 
-        return (economyProvider != null);
-    }
+	}
     
     private Boolean setupPermission()
     {
@@ -124,22 +118,21 @@ public class PayRanks extends JavaPlugin
 		    		}
 		    		else if(i < Len)
 		    		{
-		    			Account account = iConomy.getAccount(sender.getName());
 		    			String rnumx = nextr.toString();
 		    			String keyx = ("rank" + rnumx);
 		    			String rankx = ranks.get(keyx);
-		    			if(account.getHoldings().hasEnough(Rank.getInt("groups." + rankx)))
+		    			if(EconomyHandler.hasEnough(sender, Rank.getDouble("groups." + rankx)))
 		    			{
 		    				Group newGroup = permission.getWorldData(sender).getGroup(rankx);
 		    				permission.getWorldData(sender).getUser(sender.getName()).setGroup(newGroup);
-		    				account.getHoldings().subtract(Rank.getInt("groups." + rankx));
+		    				EconomyHandler.subtract(sender,Rank.getDouble("groups." + rankx));
 		    				//sender.sendMessage(ChatColor.GREEN + "You have been promoted to the rank of: " + ChatColor.BLUE + rankx);
 		    				Bukkit.broadcastMessage(ChatColor.AQUA + sender.getName() + ChatColor.GREEN + " has been promoted to the rank of: " + ChatColor.BLUE + rankx);
 		    				return;
 		    			}
 		    			else
 		    			{
-		    				Integer price = Rank.getInt("groups." + rankx);
+		    				Double price = Rank.getDouble("groups." + rankx);
 		    				String pricex = price.toString();
 		    				sender.sendMessage(ChatColor.RED + "You need " + ChatColor.BLUE + pricex + ChatColor.RED + " to purchase the rank of: " + ChatColor.BLUE + rankx);
 		    				return;

@@ -5,5 +5,7 @@
 	<classpathentry kind="lib" path="../lib/craftbukkit.jar"/>
 	<classpathentry kind="lib" path="../lib/EssentialsGroupManager.jar"/>
 	<classpathentry kind="lib" path="../lib/iConomy.jar"/>
+	<classpathentry kind="lib" path="../lib/Register.jar"/>
+	<classpathentry kind="lib" path="../lib/Vault.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

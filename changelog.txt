@@ -2,3 +2,5 @@
 	- Removed all hooks for vault.
 	- Update to JRE 1.7.
 	- Configured as a demo of using GroupManager as a service with iConomy 5.01.
+1.1:
+	- Added Register 1.7 and Vault support for Economy handling.
