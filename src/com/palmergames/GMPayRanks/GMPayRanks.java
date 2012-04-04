@@ -29,7 +29,7 @@ public class GMPayRanks extends JavaPlugin
     protected final Logger logger = Logger.getLogger("Minecraft");
 	protected File RankFile;
 	protected FileConfiguration Rank;
-	HashMap<String, String> ranks = new HashMap<String, String>();
+	protected HashMap<String, String> ranks = null;
 	protected int Hashlen;
 	
 	protected WorldsHolder permission = null;
@@ -48,6 +48,7 @@ public class GMPayRanks extends JavaPlugin
 		        e.printStackTrace();
 		    }
 		    Rank = new YamlConfiguration();
+		    ranks = new HashMap<String, String>();
 		    loadYamls();
 		    setupHash();
 		} else {
@@ -113,7 +114,7 @@ public class GMPayRanks extends JavaPlugin
 		    	{
 		    		if(i == (Len - 1))
 		    		{
-		    			sender.sendMessage(ChatColor.GOLD + "You are at the highest possible paid rank!");
+		    			sender.sendMessage(ChatColor.GOLD + "You are at the highest possible paid rank! ("+rank+")");
 		    			return;
 		    		}
 		    		else if(i < Len)

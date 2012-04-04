@@ -4,3 +4,5 @@
 	- Configured as a demo of using GroupManager as a service with iConomy 5.01.
 1.1:
 	- Added Register 1.7 and Vault support for Economy handling.
+1.2:
+	- Fix an error on '/reload' where it loses it's ranks.
