@@ -1,6 +1,6 @@
 name: GMPaidRanks
 main: com.palmergames.GMPayRanks.GMPayRanks
-version: 1.1
+version: 1.2
 authors: [polaris120990,ElgarL]
 description: >
              Ranks a player up for money.
