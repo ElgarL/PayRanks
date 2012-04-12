@@ -6,3 +6,5 @@
 	- Added Register 1.7 and Vault support for Economy handling.
 1.2:
 	- Fix an error on '/reload' where it loses it's ranks.
+1.3:
+	-Fix an error when a GM reload would re-register the service but this plugin would not know about it.
