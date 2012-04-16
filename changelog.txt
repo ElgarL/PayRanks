@@ -7,4 +7,7 @@
 1.2:
 	- Fix an error on '/reload' where it loses it's ranks.
 1.3:
-	-Fix an error when a GM reload would re-register the service but this plugin would not know about it.
+	- Fix an error when a GM reload would re-register the service but this plugin would not know about it.
+1.4:
+	- Revert the previous fix as it's now fixed in GroupManager.
+	- Trap an error when setting up the economy handler and not using Vault.

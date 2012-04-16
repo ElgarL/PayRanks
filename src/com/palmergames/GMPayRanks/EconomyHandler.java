@@ -72,15 +72,18 @@ public class EconomyHandler {
         /*
          * Attempt to find Vault for Economy handling
          */
-        RegisteredServiceProvider<Economy> vaultEcoProvider = Bukkit.getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
-        if (vaultEcoProvider != null) {
-        	/*
-        	 * Flag as using Vault hooks
-        	 */
-        	vaultEconomy = vaultEcoProvider.getProvider();
-        	Type = EcoType.VAULT;
-        	return true;
-        }
+        try {
+	        RegisteredServiceProvider<Economy> vaultEcoProvider = Bukkit.getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+	        if (vaultEcoProvider != null) {
+	        	/*
+	        	 * Flag as using Vault hooks
+	        	 */
+	        	vaultEconomy = vaultEcoProvider.getProvider();
+	        	Type = EcoType.VAULT;
+	        	return true;
+	        }
+        } catch (NoClassDefFoundError ex) {
+		}
         
         /*
          * No compatible Economy system found.

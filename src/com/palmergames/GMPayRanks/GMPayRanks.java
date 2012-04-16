@@ -110,12 +110,6 @@ public class GMPayRanks extends JavaPlugin
 				String rnum = i.toString();
 		    	String key = ("rank" + rnum);
 		    	String rank = ranks.get(key);
-		    	
-		    	// Make sure the permission service is still running.
-		    	if (!setupPermission()) {
-		    		sender.sendMessage(ChatColor.RED + "Sorry the GroupManager is currently offline!");
-	    			return;
-		    	}
 		    		
 		    	if(permission.getWorldData(sender).getPermissionsHandler().inGroup(sender.getName(), rank))
 		    	{
